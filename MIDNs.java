@@ -1,8 +1,8 @@
 
- import robocode.HitRobotEvent;
+import robocode.HitRobotEvent;
 //import robocode.Robot;
 import robocode.ScannedRobotEvent;
-import robocode.BravoBot;
+//import robocode.BravoBot;
 import robocode.*;
 
 import java.awt.*;
@@ -16,7 +16,7 @@ import java.awt.*;
  * @author Mathew A. Nelson (original)
  * @author Flemming N. Larsen (contributor)
  */
-public class MIDNs extends BravoBot {
+public class MIDNs extends CharlieBot {
 
 	boolean peek; // Don't turn if there's a robot there
 	double moveAmount; // How much to move
@@ -47,9 +47,9 @@ public class MIDNs extends BravoBot {
 		ahead(moveAmount);
 		// Turn the gun to turn right 90 degrees.
 		peek = true;
-		turnGunRight(0);
+		turnGunRight(180);
 		turnRight(90);
-
+		turnGunRight(180);
 		while (true) {
 			// Look before we turn when ahead() completes.
 			peek = true;
@@ -59,6 +59,8 @@ public class MIDNs extends BravoBot {
 			peek = false;
 			// Turn to the next wall
 			turnRight(90);
+			turnGunRight(180);
+			fire(10);
 		}
 	}
 
@@ -69,6 +71,7 @@ public class MIDNs extends BravoBot {
 		// If he's in front of us, set back up a bit.
 		if (e.getBearing() > -90 && e.getBearing() < 90) {
 			back(100);
+			
 		} // else he's in back of us, so set ahead a bit.
 		else {
 			ahead(100);
@@ -85,15 +88,21 @@ public class MIDNs extends BravoBot {
 	/**
 	 * onScannedRobot:  Fire!
 	 */
-	public void onScannedRobot(ScannedRobotEvent e) {
+	public void onRobotDeteted(ScannedRobotEvent e) {
+		
 		fire(10);
 		// Note that scan is called automatically when the robot is moving.
 		// By calling it manually here, we make sure we generate another scan event if there's a robot on the next
 		// wall, so that we do not start moving up it until it's gone.
 		if (peek) {
 			scan();
+			
+			
 		}
+		//turnGunRight(180);
 	}
+	
+	
 	
 	public void onWin(WinEvent e) {
         // Victory dance
