@@ -1,7 +1,7 @@
 
 import robocode.*;
 import static robocode.util.Utils.normalRelativeAngleDegrees;
-//import java.awt.Color;
+import java.awt.Color;
 
 // API help : http://robocode.sourceforge.net/docs/robocode/robocode/Robot.html
 
@@ -11,17 +11,32 @@ import static robocode.util.Utils.normalRelativeAngleDegrees;
 public class MIDNs extends AlphaBot
 {
 	int dist = 50;
+	boolean peek; // Don't turn if there's a robot there
+	double moveAmount;
+	//int trigger;
 	/**
 	 * run: MIDNs's default behavior
 	 */
 	public void run() {
-		// Initialization of the robot should be put here
-
-		// After trying out your robot, try uncommenting the import at the top,
-		// and the next line:
-
-		// setColors(Color.red,Color.blue,Color.green); // body,gun,radar
-
+			setBodyColor(Color.blue);
+			setGunColor(Color.blue);
+			setRadarColor(Color.black);
+			setScanColor(Color.yellow);
+			
+		//	trigger = 80;
+			
+		/*	addCustomEvent(new Condition("triggerhit") {
+			public boolean test() {
+				return (getEnergy() <= trigger);
+			}
+		});*/
+			moveAmount = Math.max(getBattleFieldWidth(), getBattleFieldHeight());
+			peek = false;
+			turnLeft(getHeading() % 90);
+		    ahead(moveAmount);
+			peek = true;
+			turnGunRight(90);
+			turnRight(90);
 		// Robot main loop
 		while(true) {
 			// Replace the next 4 lines with any behavior you would like
@@ -29,6 +44,14 @@ public class MIDNs extends AlphaBot
 			turnGunRight(360);
 			back(100);
 			turnGunRight(360);
+			
+			peek = true;
+			ahead(moveAmount);
+			peek = false;
+			turnRight(90);
+			
+		  
+				
 		}
 	}
 
@@ -45,7 +68,10 @@ public class MIDNs extends AlphaBot
 			fire(1);
 		}
 		// Call scan again, before we turn the gun
-		scan();
+		fire(2);
+		if (peek) {
+			scan();
+		}
 	}
 
 	/**
@@ -62,10 +88,24 @@ public class MIDNs extends AlphaBot
 		scan();
 	}
 	public void onHitRobot(HitRobotEvent e) {
-		double turnGunAmt = normalRelativeAngleDegrees(e.getBearing() + getHeading() - getGunHeading());
+		/*double turnGunAmt = normalRelativeAngleDegrees(e.getBearing() + getHeading() - getGunHeading());
 
 		turnGunRight(turnGunAmt);
-		fire(1);
+		fire(1);*/
+		
+	/*	if (e.getBearing() > -10 && e.getBearing() < 10) {
+			fire(3);
+		}
+		if (e.isMyFault()) {
+			turnRight(10);
+		}*/
+		
+		if (e.getBearing() > -90 && e.getBearing() < 90) {
+			back(100);
+		} // else he's in back of us, so set ahead a bit.
+		else {
+			ahead(100);
+		}
 	}
 	
 	/**
@@ -78,4 +118,17 @@ public class MIDNs extends AlphaBot
 		
 	
 	}	
+	
+	/*public void onCustomEvent(CustomEvent e) {
+		// If our custom event "triggerhit" went off,
+		if (e.getCondition().getName().equals("triggerhit")) {
+			// Adjust the trigger value, or
+			// else the event will fire again and again and again...
+			trigger -= 20;
+			out.println("Ouch, down to " + (int) (getEnergy() + .5) + " energy.");
+			// move around a bit.
+			turnLeft(65);
+			ahead(100);
+		}
+	}*/
 }
